@@ -1,0 +1,90 @@
+pybluez
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+
+# Placeholder for Bluetooth connection functionalities
+class BluetoothConnector:
+    def __init__(self, update_device_list_callback):
+        self.address = "4F:98:56:B5:52:5B"  # Treadmill address
+        self.update_device_list_callback = update_device_list_callback
+
+    def scan_devices(self):
+        print("Scanning for devices...")
+        # Simulate device found
+        print(f"Found device at {self.address}")
+        self.update_device_list_callback([self.address])
+
+    def connect_device(self, address):
+        if address == self.address:
+            print(f"Connecting to device at {address}")
+            # Simulate successful connection
+            print("Connected successfully.")
+            messagebox.showinfo("Connection", "Connected successfully to the treadmill.")
+        else:
+            messagebox.showerror("Connection", "Failed to connect to the device.")
+
+# Main application class
+class TreadmillApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Treadmill App")
+        self.geometry("800x600")
+
+        # Initialize Bluetooth connector
+        self.bluetooth_connector = BluetoothConnector(self.update_device_list)
+
+        # Setup UI components
+        self.setup_ui()
+
+    def setup_ui(self):
+        # Create a tab control
+        self.tab_control = ttk.Notebook(self)
+        
+        # Connect tab
+        self.setup_connect_tab()
+        
+        # Sessions tab
+        self.tab_sessions = ttk.Frame(self.tab_control)
+        self.tab_control.add(self.tab_sessions, text='Sessions')
+        
+        # Current Session tab
+        self.tab_current_session = ttk.Frame(self.tab_control)
+        self.tab_control.add(self.tab_current_session, text='Current Session')
+        
+        self.tab_control.pack(expand=1, fill="both")
+
+    def setup_connect_tab(self):
+        self.tab_connect = ttk.Frame(self.tab_control)
+        self.tab_control.add(self.tab_connect, text='Connect')
+
+        # Scan button
+        self.scan_button = ttk.Button(self.tab_connect, text="Scan for Devices", command=self.scan_for_devices)
+        self.scan_button.pack(pady=10)
+
+        # Devices list
+        self.devices_var = tk.StringVar(value=[])
+        self.devices_listbox = tk.Listbox(self.tab_connect, listvariable=self.devices_var, height=6)
+        self.devices_listbox.pack(pady=10)
+
+        # Connect button
+        self.connect_button = ttk.Button(self.tab_connect, text="Connect to Selected Device", command=self.connect_to_device)
+        self.connect_button.pack(pady=10)
+
+    def scan_for_devices(self):
+        self.bluetooth_connector.scan_devices()
+
+    def update_device_list(self, devices):
+        self.devices_var.set(devices)
+
+    def connect_to_device(self):
+        selected = self.devices_listbox.curselection()
+        if selected:
+            address = self.devices_listbox.get(selected[0])
+            self.bluetooth_connector.connect_device(address)
+        else:
+            messagebox.showwarning("Connection", "Please select a device to connect.")
+
+if __name__ == "__main__":
+    app = TreadmillApp()
+    app.mainloop()
